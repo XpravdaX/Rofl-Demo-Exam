@@ -43,23 +43,23 @@ git config --global user.email "твой@email.ru"
 # 1. Инициализация нового репозитория
 ```bash
 git init
-```
+
 # 2. Проверка статуса (какие файлы изменены/не отслеживаются)
-```bash
+
 git status
-```
+
 # 3. Добавление файлов в отслеживание
-```bash
+
 git add .                          # все файлы
 # или точечно(Пример)
 git add README.md script.sql Program.cs
-```
+
 # 4. Создание коммита (фиксация изменений)
-```bash
+
 git commit -m "Первый коммит: структура БД и базовый код"
-```
+
 # 5. Просмотр истории коммитов
-```bash
+
 git log --oneline                   # кратко
 git log                             # подробно
 ```
@@ -68,19 +68,19 @@ git log                             # подробно
 # 6. Привязка к удаленному репозиторию (GitHub / GitLab)
 ```bash
 git remote add origin https://github.com/username/project.git
-```
+
 # 7. Проверка удаленных репозиториев
 ```bash
 git remote -v
-```
+
 # 8. Отправка изменений на сервер (в ветку main/master)
-```bash
+
 git push -u origin main              # первый раз с флагом -u
 # или если ветка называется master:
 git push -u origin master
-```
+
 # 9. Для последующих коммитов (после изменений)
-```bash
+
 git add .
 git commit -m "Описание изменений"
 git push                             # без флагов
