@@ -7,6 +7,8 @@
 
 ## Содержание
 - [Приведение к 3 нормальной форме (3НФ)](#-приведение-к-3-нормальной-форме-3нф)
+- [SQL запросы на создание БД](#-sql-запросы-на-создание-бд)
+- [SQL запросы на выборку (BETWEEN, JOIN)](#-sql-запросы-на-выборку-between-join)
 - [Git Bash — шпаргалка](#-git-bash--шпаргалка)
 - [Мои заметки](#-мои-заметки)
 - [Полезные ссылки](#-полезные-ссылки)
@@ -160,6 +162,191 @@
 > 1. **1НФ** все атрибуты атомарны (нет повторяющихся групп, каждая ячейка содержит одно значение)
 > 2. **2НФ** 1НФ + нет частичной зависимости от составного ключа (все неключевые поля зависят от полного первичного ключа)
 > 3. **3НФ** 2НФ + нет транзитивных зависимостей (неключевые поля не зависят от других неключевых полей)
+
+---
+
+## SQL запросы на создание БД
+
+### Создание базы данных
+```sql
+-- Создать новую базу данных
+CREATE DATABASE shop_db;
+
+-- Выбрать базу для работы
+USE shop_db;
+```
+### Создание таблиц (по примеру с яблоками)
+```sql
+-- Таблица "Покупатели"
+CREATE TABLE buyers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    city VARCHAR(100) NOT NULL
+);
+
+-- Таблица "Товары"
+CREATE TABLE products (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(200) NOT NULL,
+    price_per_kg DECIMAL(10, 2) NOT NULL
+);
+
+-- Таблица "Заказы"
+CREATE TABLE orders (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    buyer_id INT NOT NULL,
+    order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (buyer_id) REFERENCES buyers(id)
+);
+
+-- Таблица "Состав заказа"
+CREATE TABLE order_items (
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    kg DECIMAL(10, 2) NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+```
+
+### Полезные команды при создании
+```sql
+-- Удалить таблицу (если нужно пересоздать)
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS buyers;
+
+-- Показать структуру таблицы
+DESCRIBE buyers;
+
+-- Добавить столбец в существующую таблицу
+ALTER TABLE buyers ADD phone VARCHAR(20);
+
+-- Изменить тип данных столбца
+ALTER TABLE products MODIFY price_per_kg DECIMAL(12, 2);
+```
+
+## SQL запросы на выборку (BETWEEN, JOIN)
+### Заполнение тестовыми данными
+``` sql
+-- Добавляем покупателей
+INSERT INTO buyers (name, city) VALUES
+('Иван', 'Москва'),
+('Петр', 'Питер');
+
+-- Добавляем товары
+INSERT INTO products (name, price_per_kg) VALUES
+('Яблоки Антоновка', 150),
+('Яблоки Гренни Смит', 200);
+
+-- Добавляем заказы
+INSERT INTO orders (buyer_id) VALUES
+(1), (2), (1);
+
+-- Добавляем состав заказов
+INSERT INTO order_items (order_id, product_id, kg, amount) VALUES
+(1, 1, 2, 300),
+(1, 2, 1, 200),
+(2, 1, 3, 450),
+(3, 2, 2, 400);
+```
+### BETWEEN (диапазон значений)
+``` sql
+-- Выбрать товары с ценой от 100 до 180
+SELECT * FROM products 
+WHERE price_per_kg BETWEEN 100 AND 180;
+
+-- Выбрать заказы с суммой от 250 до 500
+SELECT * FROM order_items 
+WHERE amount BETWEEN 250 AND 500;
+
+-- Выбрать заказы за определенный период
+SELECT * FROM orders 
+WHERE order_date BETWEEN '2026-03-01' AND '2026-03-31';
+
+-- BETWEEN с текстом (по алфавиту)
+SELECT * FROM products 
+WHERE name BETWEEN 'А' AND 'Я';
+```
+
+### INNER JOIN (только совпадающие записи)
+``` sql
+-- Получить все заказы с информацией о покупателях
+SELECT orders.id, buyers.name, buyers.city, orders.order_date
+FROM orders
+INNER JOIN buyers ON orders.buyer_id = buyers.id;
+
+-- Получить состав заказов с названиями товаров
+SELECT order_items.order_id, 
+       products.name AS product_name,
+       order_items.kg, 
+       order_items.amount
+FROM order_items
+INNER JOIN products ON order_items.product_id = products.id;
+```
+### LEFT JOIN (все записи из левой таблицы)
+```sql
+-- Все покупатели и их заказы (даже если заказов нет)
+SELECT buyers.name, orders.id AS order_id, orders.order_date
+FROM buyers
+LEFT JOIN orders ON buyers.id = orders.buyer_id;
+
+-- Все товары и их продажи (даже если товар не продавался)
+SELECT products.name, order_items.kg, order_items.amount
+FROM products
+LEFT JOIN order_items ON products.id = order_items.product_id;
+```
+### Сложные JOIN (несколько таблиц)
+```sql
+-- Полная информация о заказах
+SELECT 
+    orders.id AS order_number,
+    buyers.name AS buyer_name,
+    buyers.city,
+    products.name AS product_name,
+    order_items.kg,
+    order_items.amount,
+    orders.order_date
+FROM orders
+INNER JOIN buyers ON orders.buyer_id = buyers.id
+INNER JOIN order_items ON orders.id = order_items.order_id
+INNER JOIN products ON order_items.product_id = products.id;
+```
+### JOIN с условиями
+``` sql
+-- Заказы москвичей с суммой больше 250
+SELECT 
+    buyers.name,
+    buyers.city,
+    orders.id AS order_id,
+    order_items.amount
+FROM buyers
+INNER JOIN orders ON buyers.id = orders.buyer_id
+INNER JOIN order_items ON orders.id = order_items.order_id
+WHERE buyers.city = 'Москва' 
+  AND order_items.amount > 250;
+```
+### JOIN + BETWEEN вместе
+```sql
+-- Товары, которые продавались в определенном диапазоне цен
+SELECT DISTINCT products.name, products.price_per_kg
+FROM products
+INNER JOIN order_items ON products.id = order_items.product_id
+WHERE products.price_per_kg BETWEEN 140 AND 210;
+
+-- Заказы за март с информацией о покупателях
+SELECT 
+    buyers.name,
+    buyers.city,
+    orders.id AS order_id,
+    orders.order_date
+FROM buyers
+INNER JOIN orders ON buyers.id = orders.buyer_id
+WHERE orders.order_date BETWEEN '2026-03-01' AND '2026-03-31';
+```
 
 ---
 
