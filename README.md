@@ -448,4 +448,5 @@ git push                             # без флагов
 | Ресурс | Описание | Ссылка |
 |--------|----------|--------|
 | **MySQL Tutorial (GeeksforGeeks)** | Полный справочник по синтаксису, запросам, индексам и триггерам | [перейти](https://www.geeksforgeeks.org/mysql/mysql-tutorial/) |
+| **Git Cheat Sheet** | Шпаргалка по Git от GitHub | [перейти](https://education.github.com/git-cheat-sheet-education.pdf) |
 | *добавлю позже* | — | — |
