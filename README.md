@@ -1,5 +1,12 @@
 # Rofl-Demo-Exam
 
+[![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![SQL](https://img.shields.io/badge/SQL-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://en.wikipedia.org/wiki/SQL)
+[![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/)
+[![ER-Diagram](https://img.shields.io/badge/ER--Diagram-FF6B4A?style=for-the-badge&logo=drawio&logoColor=white)](https://www.drawio.com/)
+[![Bash](https://img.shields.io/badge/Bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)](https://www.gnu.org/software/bash/)
+
 > Только начало, буду и дальше редачить  
 > Здесь будет основа базовые вещи, которые помогут на Демо-экзамене
 
